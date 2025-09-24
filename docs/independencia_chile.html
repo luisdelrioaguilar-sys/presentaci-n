@@ -1,0 +1,135 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Independencia de Chile - 18 de Septiembre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #003087;
+            color: white;
+            text-align: center;
+            padding: 2em;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            background-color: #d81e05;
+            padding: 1em;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1em;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        section {
+            padding: 2em;
+            margin: 2em auto;
+            max-width: 800px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        section h2 {
+            color: #003087;
+            border-bottom: 2px solid #d81e05;
+            padding-bottom: 0.5em;
+        }
+        section img {
+            max-width: 100%;
+            height: auto;
+            margin: 1em 0;
+            border: 1px solid #ccc;
+        }
+        footer {
+            background-color: #003087;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>La Independencia de Chile: 18 de Septiembre</h1>
+    </header>
+    <nav>
+        <a href="#contexto">Contexto Histórico</a>
+        <a href="#eventos">Eventos Clave</a>
+        <a href="#figuras">Figuras Importantes</a>
+    </nav>
+    <section id="contexto">
+        <h2>Contexto Histórico</h2>
+        <p>La Independencia de Chile comenzó en 1810, en un contexto de crisis en la monarquía española debido a la invasión napoleónica. La Primera Junta Nacional de Gobierno, formada el 18 de septiembre de 1810, marcó el inicio del proceso independentista, aunque la independencia total se consolidó en 1818 tras la Batalla de Maipú.</p>
+        <img src="images/historia1.jpg" alt="Primera Junta Nacional de Gobierno">
+    </section>
+    <section id="eventos">
+        <h2>Eventos Clave</h2>
+        <p>El proceso incluyó hitos como la Batalla de Rancagua (1814), que marcó un revés para los patriotas, y la posterior reconquista liderada por el Ejército de los Andes. La declaración oficial de la independencia se firmó el 12 de febrero de 1818 en Talca.</p>
+        <img src="images/historia2.jpg" alt="Batalla de Maipú">
+    </section>
+    <section id="figuras">
+        <h2>Figuras Importantes</h2>
+        <p>Figuras como Bernardo O'Higgins, considerado el "Padre de la Patria", y José de San Martín, líder del Ejército de los Andes, fueron fundamentales. Otros personajes clave incluyen a Manuel Rodríguez, líder de la resistencia guerrillera.</p>
+        <img src="images/historia3.jpg" alt="Bernardo O'Higgins">
+    </section>
+    <footer>
+        <p>&copy; 2025 - Presentación sobre la Independencia de Chile</p>
+    </footer>
+</body>
+</html>
